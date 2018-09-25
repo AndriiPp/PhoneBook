@@ -8,8 +8,10 @@
 
 import UIKit
 import CoreData
+import libPhoneNumber_iOS
 
 class DetailController: UIViewController {
+    let phoneUtil = NBPhoneNumberUtil()
     var contact : Contacts?{
         didSet {
             navigationItem.title = contact?.name
@@ -109,6 +111,13 @@ class DetailController: UIViewController {
         setupSubviews()
         if let contact = contact {
             numberText.text = contact.number
+            do {
+                let phoneNumber: NBPhoneNumber = try phoneUtil.parse(numberText.text, defaultRegion: "UA")
+                numberText.text = try phoneUtil.format(phoneNumber, numberFormat: .INTERNATIONAL)
+                
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            }
             nameText.text = contact.name
             surnameText.text = contact.surname
             emailText.text = contact.email
@@ -117,6 +126,7 @@ class DetailController: UIViewController {
                 imageView.image = UIImage(data: image as Data)
             }
         }
+
     }
    
     @objc func saving(){
